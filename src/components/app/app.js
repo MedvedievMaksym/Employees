@@ -11,9 +11,9 @@ class App extends Component {
 		super(props);
 		this.state = {
 			data: [
-				{name: 'Andy R.', salary: 1900, increase: false, id: 1},
-				{name: 'Lex D.', salary: 12000, increase: true, id: 2},
-				{name: 'Max M.', salary: 15000, increase: false, id: 3},
+				{name: 'Andy R.', salary: 1900, increase: false, rise: true, id: 1},
+				{name: 'Lex D.', salary: 12000, increase: true, rise: false, id: 2},
+				{name: 'Max M.', salary: 15000, increase: false, rise: false, id: 3},
 			]
 		}
 		this.maxId = 4;
@@ -32,6 +32,7 @@ class App extends Component {
 			name,
 			salary,
 			increase: false,
+			rise: false,
 			id: this.maxId++
 		}
 		this.setState(({data}) => {
@@ -42,10 +43,32 @@ class App extends Component {
 		});
 	}
 
+	onToggleProp = (id, prop) => {
+		this.setState(({data}) => ({
+			//возвр новый обьект со свойством data, проходим по массиву
+			data: data.map(item => {
+				//если совпали id значит найден нужный обьект
+				if(item.id === id) {
+					//возвр новый массив с измененным значением
+					return {...item, [prop]: !item[prop]}
+				}
+				return item;
+			})
+		}))
+	}
+
 	render() {
+
+		const employees = this.state.data.length;
+		//получим длинну нов массива с обьектами у которых increase === true
+		const increased = this.state.data.filter(item => item.increase).length;
+
 		return (
 			<div className="app">
-				<AppInfo />
+				<AppInfo
+					employees={employees}
+					increased={increased}
+				/>
 
 				<div className="search-panel">
 					<SearchPanel />
@@ -54,8 +77,10 @@ class App extends Component {
 
 				<EmployeesList
 					data={this.state.data}
-					onDelete={this.deleteItem}/>
-				<EmployeesAddForm onAdd={this.addItem}/>
+					onDelete={this.deleteItem}
+					onToggleProp={this.onToggleProp}
+				/>
+				<EmployeesAddForm onAdd={this.addItem} />
 			</div>
 		);
 	}
